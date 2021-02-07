@@ -1,0 +1,24 @@
+{
+  "name": "employee-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "source.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shawnmflanigan/employee-manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shawnmflanigan/employee-manager/issues"
+  },
+  "homepage": "https://github.com/Shawnmflanigan/employee-manager#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.3.3"
+  }
+}
