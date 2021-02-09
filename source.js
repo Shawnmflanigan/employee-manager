@@ -84,16 +84,40 @@ const veiwDep = () => {
         .then((answer) => {
             if (answer.choices === 'Sales') {
                 console.log('sales');
-                veiwDep();
+                connection.query(
+                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 1', (err, res) => {
+                        if (err) throw err;
+                        console.table(res);
+                        veiwDep();
+                    }
+                )
             } else if (answer.choices === 'Engineering') {
-                console.log('Engineering');
-                veiwDep();
+                connection.query(
+                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 2', (err, res) => {
+                        if (err) throw err;
+                        console.table(res);
+                        veiwDep();
+                    }
+                )
+
             } else if (answer.choices === 'Legal') {
-                console.log('Legal');
-                veiwDep();
+                connection.query(
+                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 3', (err, res) => {
+                        if (err) throw err;
+                        console.table(res);
+                        veiwDep();
+                    }
+                )
+
             } else if (answer.choices === 'Hospitality') {
-                console.log('Hospitality');
-                veiwDep();
+                connection.query(
+                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 4', (err, res) => {
+                        if (err) throw err;
+                        console.table(res);
+                        veiwDep();
+                    }
+                )
+
             } else {
                 start();
             }
