@@ -15,6 +15,13 @@ var connection = mysql.createConnection({
     database: "employee_mng"
 });
 
+// Connect to the DB
+connection.connect((err) => {
+    if (err) throw err;
+    console.log(`connected as id ${connection.threadId}\n`);
+    start();
+});
+
 // Inquirer flow
 
 const start = () => {
@@ -29,59 +36,114 @@ const start = () => {
             if (answer.choices === 'View all Employees') {
                 veiwAll();
             } else if (answer.choices === 'View all Employees by Department') {
-                console.log('View Departments');
-                start();
+                veiwDep();
             } else if (answer.choices === 'View all Employees by Manager') {
-                console.log('View all Employees by Manager');
-                start();
+                viewMan();
             } else if (answer.choices === 'Add Employee') {
-                console.log('Add Employee');
-                start();
+                addEmp();
             } else if (answer.choices === 'Remove Employee') {
-                console.log('Remove Employee');
-                start();
+                remEmp();
             } else if (answer.choices === 'Update Employee Role') {
-                console.log('Update Employee Role');
-                start();
+                upEmp();
             } else if (answer.choices === 'Update Employee Manager') {
-                console.log('Update Employee Manager');
-                start();
+                upEmpMan();
             } else if (answer.choices === 'View all Roles') {
-                console.log('View all Roles');
-                start();
+                viewRoles();
             } else if (answer.choices === 'Add Role') {
-                console.log('Add Role');
-                start();
+                addRole();
             } else if (answer.choices === 'Remove Role') {
-                console.log('Remove Role');
-                start();
+                remRole();
             } else {
                 connection.end();
             }
         })
 }
 
-// functions for each selection 
+// FUNCTIONS FOR EACH SELECTION 
 
 // view all employees
-const veiwAll  = () => {
+const veiwAll = () => {
     console.log('Selecting all employees...\n');
-    connection.query('SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id;', (err, res) => {
-      if (err) throw err;
-      // Log all results of the SELECT statement
-      console.table(res);
-      start();
-    });
-  };
+    connection.query(
+        'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id;', (err, res) => {
+            if (err) throw err;
+            console.table(res);
+            start();
+        });
+};
 
+// View Department
+const veiwDep = () => {
+    inquirer.prompt({
+        name: 'choices',
+        type: 'list',
+        message: 'Please choose a department',
+        choices: ['Sales', 'Engineering', 'Legal', 'Hospitality', 'Exit']
+    })
 
+        .then((answer) => {
+            if (answer.choices === 'Sales') {
+                console.log('sales');
+                veiwDep();
+            } else if (answer.choices === 'Engineering') {
+                console.log('Engineering');
+                veiwDep();
+            } else if (answer.choices === 'Legal') {
+                console.log('Legal');
+                veiwDep();
+            } else if (answer.choices === 'Hospitality') {
+                console.log('Hospitality');
+                veiwDep();
+            } else {
+                start();
+            }
+        })
+}
 
-// Connect to the DB
-connection.connect((err) => {
-    if (err) throw err;
-    console.log(`connected as id ${connection.threadId}\n`);
+// View Employee by manager
+const viewMan = () => {
+    console.log('Viewing Employees by manager...\n');
     start();
-});
+};
 
+// Add Employee
+const addEmp = () => {
+    console.log('Add an Employee...\n');
+    start();
+};
 
+// Remove Employee
+const remEmp = () => {
+    console.log('Remove an Employee...\n');
+    start();
+};
 
+// Update Employee
+const upEmp = () => {
+    console.log('Update Employee...\n');
+    start();
+};
+
+// Update Employee Manager
+const upEmpMan = () => {
+    console.log('Update Employee Manager...\n');
+    start();
+};
+
+// View Roles
+const viewRoles = () => {
+    console.log('View Roles...\n');
+    start();
+};
+
+// Add Role
+const addRole = () => {
+    console.log('Add Roles...\n');
+    start();
+};
+
+// Remove Role
+const remRole = () => {
+    console.log('Remove Role...\n');
+    start();
+};
