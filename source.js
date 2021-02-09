@@ -1,7 +1,7 @@
 // Dependancies
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-const consoleTable = require("console.table");
+const cTable = require("console.table");
 
 // mySql connection
 var connection = mysql.createConnection({
@@ -27,8 +27,7 @@ const start = () => {
         // Choices
         .then((answer) => {
             if (answer.choices === 'View all Employees') {
-                console.log('View all');
-                start();
+                veiwAll();
             } else if (answer.choices === 'View all Employees by Department') {
                 console.log('View Departments');
                 start();
@@ -37,9 +36,6 @@ const start = () => {
                 start();
             } else if (answer.choices === 'Add Employee') {
                 console.log('Add Employee');
-                start();
-            } else if (answer.choices === 'Remove Employee') {
-                console.log('Remove Employee');
                 start();
             } else if (answer.choices === 'Remove Employee') {
                 console.log('Remove Employee');
@@ -65,6 +61,18 @@ const start = () => {
         })
 }
 
+// functions for each selection 
+
+// view all employees
+const veiwAll  = () => {
+    console.log('Selecting all employees...\n');
+    connection.query('SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id;', (err, res) => {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.table(res);
+      start();
+    });
+  };
 
 
 
