@@ -29,30 +29,36 @@ const start = () => {
         name: 'choices',
         type: 'list',
         message: 'Welcome to Employee Manager: please choose from the following.',
-        choices: ['View all Employees', 'View all Employees by Department', 'View all Employees by Manager', 'Add Employee', 'Remove Employee', 'Update Employee Role', 'Update Employee Manager', 'View all Roles', 'Add Role', 'Remove Role', 'Exit Employee Manager']
+        choices: ['View all Employees', 'View all Employees by Department', 'View all Roles', 'Add Employee', 'Add Department', 'Add Role',  'Update Employee Manager', 'View Employee Manager', 'Remove Department',  'Remove Role', 'Remove Employee', 'View Budget by Department', 'Exit Employee Manager']
     })
         // Choices
+        // MVP
         .then((answer) => {
             if (answer.choices === 'View all Employees') {
                 veiwAll();
             } else if (answer.choices === 'View all Employees by Department') {
                 veiwDep();
-            } else if (answer.choices === 'View all Employees by Manager') {
-                viewMan();
-            } else if (answer.choices === 'Add Employee') {
-                addEmp();
-            } else if (answer.choices === 'Remove Employee') {
-                remEmp();
-            } else if (answer.choices === 'Update Employee Role') {
-                upEmp();
-            } else if (answer.choices === 'Update Employee Manager') {
-                upEmpMan();
             } else if (answer.choices === 'View all Roles') {
                 viewRoles();
+            } else if (answer.choices === 'Add Employee') {
+                addEmp();
+            } else if (answer.choices === 'Add Department') {
+                addDep();
             } else if (answer.choices === 'Add Role') {
                 addRole();
+        // BONUS
+            } else if (answer.choices === 'Update Employee Manager') {
+                upEmpMan();
+            } else if (answer.choices === 'View Employee Manager') {
+                viewEmpMan();
+            } else if (answer.choices === 'Remove Department') {
+                remDep();
             } else if (answer.choices === 'Remove Role') {
                 remRole();
+            } else if (answer.choices === 'Remove Employee') {
+                remEmp();
+            } else if (answer.choices === 'View Budget by Department') {
+                viewBud();
             } else {
                 connection.end();
             }
@@ -124,39 +130,46 @@ const veiwDep = () => {
         })
 }
 
-// View Employee by manager
-const viewMan = () => {
-    console.log('Viewing Employees by manager...\n');
-    start();
+// View Employee Roles
+const viewRoles = () => {
+    console.log('View all roles...\n');
+    connection.query("SELECT title FROM roles", (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        start();
+    });
+
 };
+
+
 
 // Add Employee
 const addEmp = () => {
     console.log('Add an Employee...\n');
+    connection.query("SELECT name FROM departments", (err, results) => {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: 'departments',
+                type: 'list',
+                message: 'Please select a Department:',
+                choices() {
+                    const depArray = [];
+                    results.forEach(({ name }) => {
+                        depArray.push(name);
+                    });
+                    return depArray;
+                }
+            }
+        ]);
+    });
     start();
 };
+// 'Add Department', 'Add Role',  'Update Employee Manager', 'View Employee Manager', 'Remove Department',  'Remove Role', 'Remove Employee', 'View Budget by Department', 'Exit Employee Manager'
 
-// Remove Employee
-const remEmp = () => {
-    console.log('Remove an Employee...\n');
-    start();
-};
-
-// Update Employee
-const upEmp = () => {
-    console.log('Update Employee...\n');
-    start();
-};
-
-// Update Employee Manager
-const upEmpMan = () => {
-    console.log('Update Employee Manager...\n');
-    start();
-};
-
-// View Roles
-const viewRoles = () => {
-    console.log('View Roles...\n');
+// Add Department
+const addDep = () => {
+    console.log('Add Department...\n');
     start();
 };
 
@@ -166,8 +179,55 @@ const addRole = () => {
     start();
 };
 
+//Update Employee Manager
+const upEmpMan = () => {
+    console.log('Update Employee Manager...\n');
+    start();
+};
+
+// View Employee by Manager
+const viewEmpMan = () => {
+    console.log('View Employee Manager...\n');
+    start();
+};
+// Remove Department
+const remDep = () => {
+    console.log('Remove Department...\n');
+    start();
+};
+
 // Remove Role
 const remRole = () => {
     console.log('Remove Role...\n');
+    start();
+};
+
+// Remove Employee
+const remEmp = () => {
+    console.log('Remove an Employee...\n');
+    connection.query("SELECT CONCAT (first_name,' ',last_name, ' ') as Name FROM employee", (err, results) => {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: 'choices',
+                type: 'list',
+                message: 'Please select an Employee to Remove:',
+                choices() {
+                    const empArray = [];
+                    results.forEach(({ Name }) => {
+                        empArray.push(Name);
+                    });
+                    return empArray;
+                }
+            }
+        ])
+    })
+    start();
+};
+
+// View Budget by Department
+
+const viewBud = () => {
+    console.log('View Budget by Department..\n');
     start();
 };
