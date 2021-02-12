@@ -87,48 +87,48 @@ const veiwDep = () => {
         start();
     });
 };
-    // THIS WILL BE UPDATED LATER TO BE ABLE TO VIEW EMPLOYEES BY DEPARTMENT!!!!
-    // .then((answer) => {
-    //     if (answer.choices === 'Sales') {
-    //         console.log('sales');
-    //         connection.query(
-    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 1', (err, res) => {
-    //                 if (err) throw err;
-    //                 console.table(res);
-    //                 veiwDep();
-    //             }
-    //         )
-    //     } else if (answer.choices === 'Engineering') {
-    //         connection.query(
-    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 2', (err, res) => {
-    //                 if (err) throw err;
-    //                 console.table(res);
-    //                 veiwDep();
-    //             }
-    //         )
+// THIS WILL BE UPDATED LATER TO BE ABLE TO VIEW EMPLOYEES BY DEPARTMENT!!!!
+// .then((answer) => {
+//     if (answer.choices === 'Sales') {
+//         console.log('sales');
+//         connection.query(
+//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 1', (err, res) => {
+//                 if (err) throw err;
+//                 console.table(res);
+//                 veiwDep();
+//             }
+//         )
+//     } else if (answer.choices === 'Engineering') {
+//         connection.query(
+//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 2', (err, res) => {
+//                 if (err) throw err;
+//                 console.table(res);
+//                 veiwDep();
+//             }
+//         )
 
-    //     } else if (answer.choices === 'Legal') {
-    //         connection.query(
-    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 3', (err, res) => {
-    //                 if (err) throw err;
-    //                 console.table(res);
-    //                 veiwDep();
-    //             }
-    //         )
+//     } else if (answer.choices === 'Legal') {
+//         connection.query(
+//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 3', (err, res) => {
+//                 if (err) throw err;
+//                 console.table(res);
+//                 veiwDep();
+//             }
+//         )
 
-    //     } else if (answer.choices === 'Hospitality') {
-    //         connection.query(
-    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 4', (err, res) => {
-    //                 if (err) throw err;
-    //                 console.table(res);
-    //                 veiwDep();
-    //             }
-    //         )
+//     } else if (answer.choices === 'Hospitality') {
+//         connection.query(
+//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 4', (err, res) => {
+//                 if (err) throw err;
+//                 console.table(res);
+//                 veiwDep();
+//             }
+//         )
 
-    //     } else {
-    //         start();
-    //     }
-    // })
+//     } else {
+//         start();
+//     }
+// })
 
 // View Employee Roles
 const viewRoles = () => {
@@ -144,24 +144,48 @@ const viewRoles = () => {
 // Add Employee
 const addEmp = () => {
     console.log('Add an Employee...\n');
-    connection.query("SELECT title FROM roles", (err, results) => {
+    connection.query("SELECT * FROM roles", (err, results) => {
         if (err) throw err;
-        inquirer.prompt([
-            {
-                name: 'title',
-                type: 'list',
-                message: 'Please select a title:',
-                choices() {
-                    const depArray = [];
-                    results.forEach(({ title }) => {
-                        depArray.push(title);
-                    });
-                    return depArray;
-                }
-            }, //Next question {}
-        ]);
+        inquirer
+            .prompt([
+                {
+                    name: 'first',
+                    type: 'input',
+                    message: 'Please enter the employee\'s first name:'
+                },
+                {
+                    name: 'last',
+                    type: 'input',
+                    message: 'Please enter the employee\'s last name:'
+                },
+                {
+                    name: 'title',
+                    type: 'list',
+                    message: 'Please select a title:',
+                    choices() {
+                        const roleArray = [];
+                        results.forEach(roles => {
+                            roleArray.push({name: roles.title, value: roles.id });
+                        }); 
+                        return roleArray;
+                    }
+                },
+            ]).then((answer) => {
+                connection.query('INSERT INTO employee SET ?',
+                    {
+                        first_name: answer.first,
+                        last_name: answer.last,
+                        role_id: answer.title,
+                        manager_id: answer.manager
+                    },
+                    (err) => {
+                        if (err) throw err;
+                        start();    
+
+                    })
+            })
     });
-    start();
+    
 };
 
 // Add Department
@@ -184,7 +208,7 @@ const addDep = () => {
                 },
                 (err) => {
                     if (err) throw err;
-                    console.log('You have added a new Depatment!');
+                    console.log('You have added a new Department!');
                 })
             start();
         });
@@ -196,49 +220,49 @@ const addRole = () => {
     connection.query('SELECT * FROM departments', (err, results) => {
         if (err) throw err;
 
-    inquirer
-        .prompt([
-            {
-                name: 'Role',
-                type: 'input',
-                message: 'Please type the the name of the new Role:'
-            },
-            {
-                name: 'Salary',
-                type: 'input',
-                message: 'Please enter the salary for this role'
-            },
-            {
-                name: 'Department',
-                type: 'list',
-                choices () {
-                    const depArray = [];
-                    results.forEach( department => {
-                    depArray.push({name: department.name, value: department.id});
-                    });
-                    console.log(depArray);
-                    return depArray;
-                },
-                message: 'Please choose a department:'
-            },
-
-        ])
-        .then((answer) => {
-            console.log(answer.Department)
-            connection.query(
-                'INSERT INTO roles SET ?',
+        inquirer
+            .prompt([
                 {
-                    title: answer.Role,
-                    salary: answer.Salary,
-                    department_id: answer.Department
+                    name: 'Role',
+                    type: 'input',
+                    message: 'Please type the the name of the new Role:'
                 },
-                (err) => {
-                    if (err) throw err;
-                    console.log('You have added a new Role!');
-                })
-            start();
-        });
-});
+                {
+                    name: 'Salary',
+                    type: 'input',
+                    message: 'Please enter the salary for this role'
+                },
+                {
+                    name: 'Department',
+                    type: 'list',
+                    choices() {
+                        const depArray = [];
+                        results.forEach(department => {
+                            depArray.push({ name: department.name, value: department.id });
+                        });
+                        console.log(depArray);
+                        return depArray;
+                    },
+                    message: 'Please choose a department:'
+                },
+
+            ])
+            .then((answer) => {
+                console.log(answer.Department)
+                connection.query(
+                    'INSERT INTO roles SET ?',
+                    {
+                        title: answer.Role,
+                        salary: answer.Salary,
+                        department_id: answer.Department
+                    },
+                    (err) => {
+                        if (err) throw err;
+                        console.log('You have added a new Role!');
+                    })
+                start();
+            });
+    });
 };
 //Update Employee Manager
 const upEmpMan = () => {
