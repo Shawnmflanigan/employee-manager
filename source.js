@@ -29,14 +29,14 @@ const start = () => {
         name: 'choices',
         type: 'list',
         message: 'Welcome to Employee Manager: please choose from the following.',
-        choices: ['View all Employees', 'View all Employees by Department', 'View all Roles', 'Add Employee', 'Add Department', 'Add Role',  'Update Employee Manager', 'View Employee Manager', 'Remove Department',  'Remove Role', 'Remove Employee', 'View Budget by Department', 'Exit Employee Manager']
+        choices: ['View all Employees', 'View all Departments', 'View all Roles', 'Add Employee', 'Add Department', 'Add Role', 'Update Employee Manager', 'View Employee Manager', 'Remove Department', 'Remove Role', 'Remove Employee', 'View Budget by Department', 'Exit Employee Manager']
     })
         // Choices
         // MVP
         .then((answer) => {
             if (answer.choices === 'View all Employees') {
                 veiwAll();
-            } else if (answer.choices === 'View all Employees by Department') {
+            } else if (answer.choices === 'View all Departments') {
                 veiwDep();
             } else if (answer.choices === 'View all Roles') {
                 viewRoles();
@@ -46,7 +46,7 @@ const start = () => {
                 addDep();
             } else if (answer.choices === 'Add Role') {
                 addRole();
-        // BONUS
+                // BONUS
             } else if (answer.choices === 'Update Employee Manager') {
                 upEmpMan();
             } else if (answer.choices === 'View Employee Manager') {
@@ -80,55 +80,55 @@ const veiwAll = () => {
 
 // View Department
 const veiwDep = () => {
-    inquirer.prompt({
-        name: 'choices',
-        type: 'list',
-        message: 'Please choose a department',
-        choices: ['Sales', 'Engineering', 'Legal', 'Hospitality', 'Exit']
-    })
+    console.log('Viewing all departments...\n');
+    connection.query('SELECT * FROM departments', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        start();
+    });
+};
+    // THIS WILL BE UPDATED LATER TO BE ABLE TO VIEW EMPLOYEES BY DEPARTMENT!!!!
+    // .then((answer) => {
+    //     if (answer.choices === 'Sales') {
+    //         console.log('sales');
+    //         connection.query(
+    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 1', (err, res) => {
+    //                 if (err) throw err;
+    //                 console.table(res);
+    //                 veiwDep();
+    //             }
+    //         )
+    //     } else if (answer.choices === 'Engineering') {
+    //         connection.query(
+    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 2', (err, res) => {
+    //                 if (err) throw err;
+    //                 console.table(res);
+    //                 veiwDep();
+    //             }
+    //         )
 
-        .then((answer) => {
-            if (answer.choices === 'Sales') {
-                console.log('sales');
-                connection.query(
-                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 1', (err, res) => {
-                        if (err) throw err;
-                        console.table(res);
-                        veiwDep();
-                    }
-                )
-            } else if (answer.choices === 'Engineering') {
-                connection.query(
-                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 2', (err, res) => {
-                        if (err) throw err;
-                        console.table(res);
-                        veiwDep();
-                    }
-                )
+    //     } else if (answer.choices === 'Legal') {
+    //         connection.query(
+    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 3', (err, res) => {
+    //                 if (err) throw err;
+    //                 console.table(res);
+    //                 veiwDep();
+    //             }
+    //         )
 
-            } else if (answer.choices === 'Legal') {
-                connection.query(
-                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 3', (err, res) => {
-                        if (err) throw err;
-                        console.table(res);
-                        veiwDep();
-                    }
-                )
+    //     } else if (answer.choices === 'Hospitality') {
+    //         connection.query(
+    //             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 4', (err, res) => {
+    //                 if (err) throw err;
+    //                 console.table(res);
+    //                 veiwDep();
+    //             }
+    //         )
 
-            } else if (answer.choices === 'Hospitality') {
-                connection.query(
-                    'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 4', (err, res) => {
-                        if (err) throw err;
-                        console.table(res);
-                        veiwDep();
-                    }
-                )
-
-            } else {
-                start();
-            }
-        })
-}
+    //     } else {
+    //         start();
+    //     }
+    // })
 
 // View Employee Roles
 const viewRoles = () => {
@@ -141,44 +141,105 @@ const viewRoles = () => {
 
 };
 
-
-
 // Add Employee
 const addEmp = () => {
     console.log('Add an Employee...\n');
-    connection.query("SELECT name FROM departments", (err, results) => {
+    connection.query("SELECT title FROM roles", (err, results) => {
         if (err) throw err;
         inquirer.prompt([
             {
-                name: 'departments',
+                name: 'title',
                 type: 'list',
-                message: 'Please select a Department:',
+                message: 'Please select a title:',
                 choices() {
                     const depArray = [];
-                    results.forEach(({ name }) => {
-                        depArray.push(name);
+                    results.forEach(({ title }) => {
+                        depArray.push(title);
                     });
                     return depArray;
                 }
-            }
+            }, //Next question {}
         ]);
     });
     start();
 };
-// 'Add Department', 'Add Role',  'Update Employee Manager', 'View Employee Manager', 'Remove Department',  'Remove Role', 'Remove Employee', 'View Budget by Department', 'Exit Employee Manager'
 
 // Add Department
 const addDep = () => {
     console.log('Add Department...\n');
-    start();
+    inquirer
+        .prompt([
+            {
+                name: 'Department',
+                type: 'input',
+                message: 'Please type the name of the Department:'
+            },
+        ])
+        .then((answer) => {
+            console.log(answer.Department)
+            connection.query(
+                'INSERT INTO departments SET ?',
+                {
+                    name: answer.Department,
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log('You have added a new Depatment!');
+                })
+            start();
+        });
 };
 
 // Add Role
 const addRole = () => {
-    console.log('Add Roles...\n');
-    start();
-};
+    console.log('Add Role...\n');
+    connection.query('SELECT * FROM departments', (err, results) => {
+        if (err) throw err;
 
+    inquirer
+        .prompt([
+            {
+                name: 'Role',
+                type: 'input',
+                message: 'Please type the the name of the new Role:'
+            },
+            {
+                name: 'Salary',
+                type: 'input',
+                message: 'Please enter the salary for this role'
+            },
+            {
+                name: 'Department',
+                type: 'list',
+                choices () {
+                    const depArray = [];
+                    results.forEach( department => {
+                    depArray.push({name: department.name, value: department.id});
+                    });
+                    console.log(depArray);
+                    return depArray;
+                },
+                message: 'Please choose a department:'
+            },
+
+        ])
+        .then((answer) => {
+            console.log(answer.Department)
+            connection.query(
+                'INSERT INTO roles SET ?',
+                {
+                    title: answer.Role,
+                    salary: answer.Salary,
+                    department_id: answer.Department
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log('You have added a new Role!');
+                })
+            start();
+        });
+});
+};
 //Update Employee Manager
 const upEmpMan = () => {
     console.log('Update Employee Manager...\n');
@@ -219,7 +280,7 @@ const remEmp = () => {
                     });
                     return empArray;
                 }
-            }
+            },
         ])
     })
     start();
