@@ -313,6 +313,37 @@ const remEmp = () => {
 // View Budget by Department
 
 const viewBud = () => {
-    console.log('View Budget by Department..\n');
-    start();
+    console.log('View budget from department...\n');
+    connection.query("SELECT * FROM departments", (err, res) => {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: 'Department',
+                type: 'list',
+                choices() {
+                    const depArray = [];
+                    res.forEach(department => {
+                        depArray.push({ name: department.name, value: department.id });
+                    });
+                    return depArray;
+                },
+                message: 'Please choose a department:'
+            },
+        ])
+        .then((answer) => {
+            connection.query("SELECT SUM(salary) AS Total_Salary FROM roles WHERE ?", 
+                [
+                    {
+                        department_id: answer.Department,
+                    }
+                ],
+            (err, res) => {
+                if (err) throw err;
+                console.log("The total salary for your selected department is:")
+                console.table(res);
+                start();
+            });
+    });
+
+})
 };
