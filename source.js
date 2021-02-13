@@ -232,8 +232,15 @@ const upEmpMan = () => {
 
 // View Employee by Manager
 const viewEmpMan = () => {
-    console.log('This functionality has not been coded yet...\n');
-    start();
+    console.log('Viewing employees by manager: \n');
+    connection.query(`SELECT CONCAT(e.first_name, ' ', e.last_name) employee, CONCAT(m.first_name, ' ', m.last_name) manager, e.id
+    FROM employee m
+    JOIN employee e ON e.manager_id = m.id
+    ORDER BY e.id ASC;`, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        start();
+    });
 };
 // Remove Department
 const remDep = () => {
