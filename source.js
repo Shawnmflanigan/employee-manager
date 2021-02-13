@@ -71,11 +71,13 @@ const start = () => {
 const veiwAll = () => {
     console.log('Selecting all employees...\n');
     connection.query(
-        'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id;', (err, res) => {
+        `SELECT e.id, CONCAT (e.first_name, ' ',e.last_name) AS Name, roles.title AS Title, departments.name AS Department, roles.salary AS Salary, CONCAT(m.first_name, ' ', m.last_name) Manager FROM employee m RIGHT JOIN employee e ON e.manager_id = m.id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id ORDER BY e.id ASC;`,
+        (err, res) => 
+        {
             if (err) throw err;
             console.table(res);
             start();
-        });
+        });       
 };
 
 // View Department
@@ -87,48 +89,6 @@ const veiwDep = () => {
         start();
     });
 };
-// THIS WILL BE UPDATED LATER TO BE ABLE TO VIEW EMPLOYEES BY DEPARTMENT!!!!
-// .then((answer) => {
-//     if (answer.choices === 'Sales') {
-//         console.log('sales');
-//         connection.query(
-//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 1', (err, res) => {
-//                 if (err) throw err;
-//                 console.table(res);
-//                 veiwDep();
-//             }
-//         )
-//     } else if (answer.choices === 'Engineering') {
-//         connection.query(
-//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 2', (err, res) => {
-//                 if (err) throw err;
-//                 console.table(res);
-//                 veiwDep();
-//             }
-//         )
-
-//     } else if (answer.choices === 'Legal') {
-//         connection.query(
-//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 3', (err, res) => {
-//                 if (err) throw err;
-//                 console.table(res);
-//                 veiwDep();
-//             }
-//         )
-
-//     } else if (answer.choices === 'Hospitality') {
-//         connection.query(
-//             'SELECT employee.id, first_name, last_name, roles.title, roles.salary FROM employee LEFT JOIN roles ON employee.role_id = roles.id WHERE department_id = 4', (err, res) => {
-//                 if (err) throw err;
-//                 console.table(res);
-//                 veiwDep();
-//             }
-//         )
-
-//     } else {
-//         start();
-//     }
-// })
 
 // View Employee Roles
 const viewRoles = () => {
@@ -165,8 +125,8 @@ const addEmp = () => {
                     choices() {
                         const roleArray = [];
                         results.forEach(roles => {
-                            roleArray.push({name: roles.title, value: roles.id });
-                        }); 
+                            roleArray.push({ name: roles.title, value: roles.id });
+                        });
                         return roleArray;
                     }
                 },
@@ -180,12 +140,12 @@ const addEmp = () => {
                     },
                     (err) => {
                         if (err) throw err;
-                        start();    
+                        start();
 
                     })
             })
     });
-    
+
 };
 
 // Add Department
@@ -266,49 +226,64 @@ const addRole = () => {
 };
 //Update Employee Manager
 const upEmpMan = () => {
-    console.log('Update Employee Manager...\n');
+    console.log('This functionality has not been coded yet...\n');
     start();
 };
 
 // View Employee by Manager
 const viewEmpMan = () => {
-    console.log('View Employee Manager...\n');
+    console.log('This functionality has not been coded yet...\n');
     start();
 };
 // Remove Department
 const remDep = () => {
-    console.log('Remove Department...\n');
+    console.log('This functionality has not been coded yet...\n');
     start();
 };
 
 // Remove Role
 const remRole = () => {
-    console.log('Remove Role...\n');
+    console.log('This functionality has not been coded yet...\n');
     start();
 };
 
 // Remove Employee
 const remEmp = () => {
     console.log('Remove an Employee...\n');
-    connection.query("SELECT CONCAT (first_name,' ',last_name, ' ') as Name FROM employee", (err, results) => {
+    connection.query("SELECT id, CONCAT (first_name,' ',last_name, ' ') as Name FROM employee", (err, res) => {
         if (err) throw err;
         inquirer.prompt([
             {
                 name: 'choices',
                 type: 'list',
-                message: 'Please select an Employee to Remove:',
                 choices() {
-                    const empArray = [];
-                    results.forEach(({ Name }) => {
-                        empArray.push(Name);
-                    });
-                    return empArray;
-                }
+                    const empArray =[];
+                    res.forEach(employee => {
+                        empArray.push({ name: employee.Name, value: employee.id });
+                    });                    
+                    return (empArray);
+                    
+                },
+                message: 'Please select an Employee to Remove:',
             },
         ])
-    })
-    start();
-};
+        .then((answer) => {
+            
+            connection.query(
+                'DELETE FROM employee WHERE ?',
+                [
+                    {
+                        id: answer.choices,
+                    }
+                ],
+                (err) => {
+                    if (err) throw err;
+                    console.log('You have removed an employee');
+                })
+            start();
+        });
+});
+}
 
 // View Budget by Department
 
@@ -330,20 +305,19 @@ const viewBud = () => {
                 message: 'Please choose a department:'
             },
         ])
-        .then((answer) => {
-            connection.query("SELECT SUM(salary) AS Total_Salary FROM roles WHERE ?", 
-                [
-                    {
-                        department_id: answer.Department,
-                    }
-                ],
-            (err, res) => {
-                if (err) throw err;
-                console.log("The total salary for your selected department is:")
-                console.table(res);
-                start();
+            .then((answer) => {
+                connection.query("SELECT SUM(salary) AS Total_Salary FROM roles WHERE ?",
+                    [
+                        {
+                            department_id: answer.Department,
+                        }
+                    ],
+                    (err, res) => {
+                        if (err) throw err;
+                        console.log("The total salary for your selected department is:")
+                        console.table(res);
+                        start();
+                    });
             });
-    });
-
-})
+    })
 };
